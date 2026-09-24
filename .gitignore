@@ -1,0 +1,16 @@
+# Rust build output
+/target/
+
+# Sui Move build and trace output
+**/build/
+**/traces/
+**/.trace
+**/.coverage*
+
+# Local configuration and secrets
+*.local.toml
+*.local.yaml
+*.local.yml
+.env
+.env.*
+!.env.example
