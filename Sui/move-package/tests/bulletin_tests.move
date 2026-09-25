@@ -99,6 +99,7 @@ const ACTION_VC_ISSUER_AUTHORIZE: u8 = 41;
 const ACTION_VC_ISSUER_SUSPEND: u8 = 42;
 const ACTION_VC_ISSUER_RECOVER: u8 = 43;
 const ACTION_VC_ISSUER_REVOKE: u8 = 44;
+const ACTION_ROOT_DID_ROTATE: u8 = 51;
 const PROPOSAL_PENDING: u8 = 1;
 const PROPOSAL_PASSED: u8 = 2;
 const PROPOSAL_REJECTED: u8 = 4;
@@ -1334,6 +1335,7 @@ fun test_subject_read_interfaces_for_active_discovery() {
         assert!(auth_effective_from_ms == 0, 145);
         assert!(auth_expires_at_ms == 9000, 146);
         assert!(bulletin::subject_exists(&bulletin_obj, SUBJECT_DISCOVERY, DISCOVERY_DID), 125);
+        assert!(bulletin::subject_did(&bulletin_obj, SUBJECT_DISCOVERY, DISCOVERY_DID) == DISCOVERY_DID, 159);
         assert!(bulletin::subject_is_authorized_at(&bulletin_obj, SUBJECT_DISCOVERY, DISCOVERY_DID, 1), 126);
         assert!(bulletin::discovery_is_authorized_at(&bulletin_obj, DISCOVERY_DID, 8999), 127);
         assert!(!bulletin::discovery_is_authorized_at(&bulletin_obj, DISCOVERY_DID, 9000), 128);
@@ -1934,6 +1936,105 @@ fun test_registrar_authorize_accepts_authorized_domains() {
         assert!(
             bulletin::subject_authorized_domains(&bulletin_obj, SUBJECT_REGISTRAR, b"did:ans:registrar:with-domains") ==
                 vector[b"finance_and_business", b"legal_services"],
+            160
+        );
+        ts::return_shared(bulletin_obj);
+    };
+    scenario.end();
+}
+
+#[test]
+fun test_meta_committee_can_rotate_root_did_and_emit_sequence() {
+    bootstrap();
+
+    let mut scenario = ts::begin(META1);
+    let next_root = b"did:oan:RootNew:2Xr85ZCniRMWQ1FzsB752VU5L38WcBic";
+    create_proposal_with_signer(
+        &mut scenario, META1, COMMITTEE_META_ADMIN, ACTION_ROOT_DID_ROTATE, @0x0,
+        next_root, SUBJECT_NONE, vector[], b"policy-root-rotate",
+        b"metadata-root-rotate", b"params-root-rotate", 0, 0, 0,
+    );
+    pass_meta_proposal(&mut scenario, 1);
+
+    ts::next_tx(&mut scenario, META1);
+    let bulletin_obj = ts::take_shared<bulletin::Bulletin>(&scenario);
+    assert!(bulletin::proposal_status(&bulletin_obj, 1) == PROPOSAL_PASSED, 0);
+    assert!(bulletin::root_authority_did(&bulletin_obj) == next_root, 1);
+    assert!(bulletin::latest_event_sequence(&bulletin_obj) == 1, 2);
+    ts::return_shared(bulletin_obj);
+    scenario.end();
+}
+
+#[test, expected_failure(abort_code = oan_bulletin::bulletin::E_INVALID_COMMITTEE)]
+fun test_root_did_rotation_requires_meta_committee() {
+    bootstrap();
+    let mut scenario = ts::begin(ADMIN1);
+    create_proposal_with_signer(
+        &mut scenario, ADMIN1, COMMITTEE_ADMIN, ACTION_ROOT_DID_ROTATE, @0x0,
+        b"did:oan:RootNew", SUBJECT_NONE, vector[], b"policy", b"metadata",
+        b"params", 0, 0, 0,
+    );
+    scenario.end();
+}
+
+#[test, expected_failure(abort_code = oan_bulletin::bulletin::E_EMPTY_SUBJECT_DID)]
+fun test_root_did_rotation_rejects_empty_did() {
+    bootstrap();
+    let mut scenario = ts::begin(META1);
+    create_proposal_with_signer(
+        &mut scenario, META1, COMMITTEE_META_ADMIN, ACTION_ROOT_DID_ROTATE, @0x0,
+        vector[], SUBJECT_NONE, vector[], b"policy", b"metadata", b"params",
+        0, 0, 0,
+    );
+    scenario.end();
+}
+
+#[test, expected_failure(abort_code = oan_bulletin::bulletin::E_ROOT_DID_UNCHANGED)]
+fun test_root_did_rotation_rejects_unchanged_did() {
+    bootstrap();
+    let mut scenario = ts::begin(META1);
+    create_proposal_with_signer(
+        &mut scenario, META1, COMMITTEE_META_ADMIN, ACTION_ROOT_DID_ROTATE, @0x0,
+        ROOT_AUTHORITY_DID, SUBJECT_NONE, vector[], b"policy", b"metadata",
+        b"params", 0, 0, 0,
+    );
+    scenario.end();
+}
+
+#[test, expected_failure(abort_code = oan_bulletin::bulletin::E_INVALID_SUBJECT_TYPE)]
+fun test_root_did_rotation_rejects_authorized_domains() {
+    bootstrap();
+    let mut scenario = ts::begin(META1);
+    create_proposal_with_signer(
+        &mut scenario, META1, COMMITTEE_META_ADMIN, ACTION_ROOT_DID_ROTATE, @0x0,
+        b"did:oan:RootNew", SUBJECT_NONE, vector[b"example.org"], b"policy",
+        b"metadata", b"params", 0, 0, 0,
+    );
+    scenario.end();
+}
+
+#[test, expected_failure(abort_code = oan_bulletin::bulletin::E_INVALID_ROOT_DID_TARGET)]
+fun test_root_did_rotation_requires_zero_target_address() {
+    bootstrap();
+    let mut scenario = ts::begin(META1);
+    create_proposal_with_signer(
+        &mut scenario, META1, COMMITTEE_META_ADMIN, ACTION_ROOT_DID_ROTATE, ADMIN1,
+        b"did:oan:RootNew", SUBJECT_NONE, vector[], b"policy", b"metadata",
+        b"params", 0, 0, 0,
+    );
+    scenario.end();
+}
+
+#[test]
+fun test_subject_did_returns_empty_for_missing_subject() {
+    bootstrap();
+
+    let scenario = ts::begin(ADMIN1);
+    {
+        let bulletin_obj = ts::take_shared<bulletin::Bulletin>(&scenario);
+        assert!(
+            bulletin::subject_did(&bulletin_obj, SUBJECT_REGISTRAR, b"did:oan:2Xr85:123456789ABCDEFGHJKLMNPQRstu") ==
+                vector[],
             160
         );
         ts::return_shared(bulletin_obj);

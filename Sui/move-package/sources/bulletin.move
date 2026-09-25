@@ -50,6 +50,8 @@ const E_EMPTY_REQUIRED_HASH: u64 = 30;
 const E_DUPLICATE_OR_UNSORTED_AUTHORIZED_DOMAIN: u64 = 31;
 const E_NON_CANONICAL_AUTHORIZED_DOMAIN: u64 = 32;
 const E_WILDCARD_MIXED_AUTHORIZED_DOMAIN: u64 = 33;
+const E_ROOT_DID_UNCHANGED: u64 = 34;
+const E_INVALID_ROOT_DID_TARGET: u64 = 35;
 
 const MEMBER_ACTIVE: u8 = 1;
 const MEMBER_DISABLED: u8 = 2;
@@ -90,6 +92,7 @@ const ACTION_VC_ISSUER_AUTHORIZE: u8 = 41;
 const ACTION_VC_ISSUER_SUSPEND: u8 = 42;
 const ACTION_VC_ISSUER_RECOVER: u8 = 43;
 const ACTION_VC_ISSUER_REVOKE: u8 = 44;
+const ACTION_ROOT_DID_ROTATE: u8 = 51;
 
 const PROPOSAL_PENDING: u8 = 1;
 const PROPOSAL_PASSED: u8 = 2;
@@ -287,6 +290,10 @@ public fun create_proposal(
     assert_is_active_member(bulletin, committee_type, sender);
     validate_action_subject(action_type, subject_type);
     let now_ms = clock::timestamp_ms(clock_ref);
+    if (action_type == ACTION_ROOT_DID_ROTATE) {
+        assert!(target_address == @0x0, E_INVALID_ROOT_DID_TARGET);
+        assert!(target_did != bulletin.root_authority_did, E_ROOT_DID_UNCHANGED);
+    };
     validate_proposal_inputs(
         action_type,
         subject_type,
@@ -538,6 +545,19 @@ public fun subject_exists(
     option::is_some(&find_subject_index_opt(&bulletin.subjects, subject_type, &subject_did))
 }
 
+public fun subject_did(
+    bulletin: &Bulletin,
+    subject_type: u8,
+    subject_did: vector<u8>,
+): vector<u8> {
+    let maybe_index = find_subject_index_opt(&bulletin.subjects, subject_type, &subject_did);
+    if (option::is_none(&maybe_index)) {
+        return vector[]
+    };
+
+    vector::borrow(&bulletin.subjects, option::destroy_some(maybe_index)).subject_did
+}
+
 public fun subject_snapshot(
     bulletin: &Bulletin,
     subject_type: u8,
@@ -751,7 +771,12 @@ fun validate_proposal_inputs(
     assert!(vector::length(metadata_hash) <= MAX_HASH_BYTES, E_INPUT_TOO_LARGE);
     assert!(vector::length(params_hash) <= MAX_HASH_BYTES, E_INPUT_TOO_LARGE);
     if (subject_type == SUBJECT_NONE) {
-        assert!(vector::length(target_did) == 0, E_INVALID_SUBJECT_TYPE);
+        if (action_type == ACTION_ROOT_DID_ROTATE) {
+            assert!(vector::length(target_did) > 0, E_EMPTY_SUBJECT_DID);
+            assert!(vector::length(target_did) <= MAX_ROOT_AUTHORITY_DID_BYTES, E_INPUT_TOO_LARGE);
+        } else {
+            assert!(vector::length(target_did) == 0, E_INVALID_SUBJECT_TYPE);
+        };
         assert!(vector::length(authorized_domains) == 0, E_INVALID_SUBJECT_TYPE);
         return
     };
@@ -840,6 +865,8 @@ fun validate_action_subject(action_type: u8, subject_type: u8) {
         action_type == ACTION_VC_ISSUER_RECOVER || action_type == ACTION_VC_ISSUER_REVOKE
     ) {
         assert!(subject_type == SUBJECT_VC_ISSUER, E_INVALID_SUBJECT_TYPE);
+    } else if (action_type == ACTION_ROOT_DID_ROTATE) {
+        assert!(subject_type == SUBJECT_NONE, E_INVALID_SUBJECT_TYPE);
     } else {
         abort E_INVALID_ACTION
     }
@@ -865,6 +892,8 @@ fun expected_committee_for_action(action_type: u8): u8 {
         action_type == ACTION_VC_ISSUER_REVOKE
     ) {
         COMMITTEE_ADMIN
+    } else if (action_type == ACTION_ROOT_DID_ROTATE) {
+        COMMITTEE_META_ADMIN
     } else {
         abort E_INVALID_ACTION
     }
@@ -1060,6 +1089,8 @@ fun can_apply_passed_proposal(bulletin: &Bulletin, proposal: &Proposal): bool {
     } else if (proposal.action_type == ACTION_ADMIN_THRESHOLD_UPDATE) {
         proposal.threshold_value >= 1 &&
             proposal.threshold_value <= max_threshold(count_active_members(&bulletin.admins))
+    } else if (proposal.action_type == ACTION_ROOT_DID_ROTATE) {
+        &proposal.target_did != &bulletin.root_authority_did
     } else {
         can_apply_subject_proposal(bulletin, proposal)
     }
@@ -1179,6 +1210,11 @@ fun apply_passed_proposal(bulletin: &mut Bulletin, proposal: Proposal, now_ms: u
     } else if (proposal.action_type == ACTION_ADMIN_THRESHOLD_UPDATE) {
         validate_admin_threshold(proposal.threshold_value, count_active_members(&bulletin.admins));
         bulletin.admin_threshold = proposal.threshold_value;
+    } else if (proposal.action_type == ACTION_ROOT_DID_ROTATE) {
+        let previous_root_did = copy bulletin.root_authority_did;
+        bulletin.root_authority_did = proposal.target_did;
+        emit_root_rotation_event(bulletin, &proposal, previous_root_did, now_ms);
+        return
     } else {
         apply_subject_proposal(bulletin, &proposal, now_ms);
     };
@@ -1273,6 +1309,57 @@ fun apply_subject_proposal(bulletin: &mut Bulletin, proposal: &Proposal, now_ms:
     } else {
         abort E_INVALID_ACTION
     };
+}
+
+fun emit_root_rotation_event(
+    bulletin: &mut Bulletin,
+    proposal: &Proposal,
+    previous_root_did: vector<u8>,
+    now_ms: u64,
+) {
+    let next_sequence = bulletin.next_event_sequence + 1;
+    let previous_digest = copy bulletin.last_event_digest;
+    let event_digest = compute_event_digest(
+        next_sequence,
+        copy previous_root_did,
+        proposal.action_type,
+        proposal.proposal_id,
+        proposal.committee_type,
+        proposal.target_address,
+        SUBJECT_NONE,
+        copy proposal.target_did,
+        SUBJECT_NONE,
+        vector[],
+        0,
+        0,
+        copy proposal.policy_hash,
+        copy proposal.metadata_hash,
+        copy previous_digest,
+        now_ms,
+    );
+
+    event::emit(GovernanceExecutionEvent {
+        event_type: proposal.action_type,
+        sequence: next_sequence,
+        root_authority_did: previous_root_did,
+        proposal_id: proposal.proposal_id,
+        committee_type: proposal.committee_type,
+        target_address: proposal.target_address,
+        subject_did: copy proposal.target_did,
+        subject_type: SUBJECT_NONE,
+        subject_status: SUBJECT_NONE,
+        authorized_domains: vector[],
+        effective_from_ms: 0,
+        expires_at_ms: 0,
+        policy_hash: copy proposal.policy_hash,
+        metadata_hash: copy proposal.metadata_hash,
+        previous_event_digest: previous_digest,
+        event_digest,
+        emitted_at_ms: now_ms,
+    });
+
+    bulletin.next_event_sequence = next_sequence;
+    bulletin.last_event_digest = event_digest;
 }
 
 fun find_subject_index_opt(
