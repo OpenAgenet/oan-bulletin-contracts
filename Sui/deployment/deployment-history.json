@@ -1,0 +1,129 @@
+{
+  "network": "sui-mainnet",
+  "chainId": "35834a8a",
+  "recordedAt": "2026-09-25T18:45:00+08:00",
+  "publisher": "0x0b2bac7f473b73c37c9ba736e7545df87504028ee0981cd2fed7bfc5130a3c5d",
+  "releaseEpochs": [
+    {
+      "id": "legacy-bulletin-upgrade-lineage",
+      "status": "historical",
+      "originalPackageId": "0x1b602d575ddf1ced075f9d2986bfe53cd7d4e59967ec26a0d949009c7b2c9d6c",
+      "bulletinObjectId": "0xb900fb0dc1ebd58fbc4d0c697d644c861578ed948e26638836e338de0d1a3b46",
+      "upgradeManagerId": "0xa753d5b80f681e84f39f33c3c887971ff88f9c4791f5cd097b645dc7670aaaa8",
+      "records": [
+        {
+          "kind": "package-publish",
+          "packageId": "0x1b602d575ddf1ced075f9d2986bfe53cd7d4e59967ec26a0d949009c7b2c9d6c",
+          "source": "oan-bulletin-contracts/Sui/move-package/Published.toml",
+          "status": "recorded"
+        },
+        {
+          "kind": "package-upgrade",
+          "recordFile": "runtime/mainnet/20260629-021349-upgrade.json",
+          "transactionDigest": "109e984e81898601f9a45800e51e1a737bea1f27ce7e5a0eada3da85079480a9",
+          "packageId": "0x2fd18248c0cd42f371409eb1003176dc0d5744cccfdf2e49e5224b4249a5ffb4",
+          "status": "recorded"
+        },
+        {
+          "kind": "package-upgrade",
+          "recordFile": "runtime/mainnet/20260628-223627-upgrade.json",
+          "transactionDigest": "8e537338a78f0e1e2a1aa7c128c4e57bf92699efb4eb5740218e1321974192c4",
+          "packageId": null,
+          "status": "recorded-package-id-not-present-in-receipt"
+        },
+        {
+          "kind": "package-upgrade",
+          "recordFile": "runtime/mainnet/20260925-015223-upgrade.json",
+          "transactionDigest": "8e7fbc850dbdaeb44cc534a1868c8da83e2b127849193934627ac48bf901e796",
+          "packageId": "0x232f984a25ceb8358290a8bae594078deca2d670a80c8d57d291d64a491d7fd5",
+          "status": "recorded"
+        },
+        {
+          "kind": "package-upgrade",
+          "recordFile": "runtime/mainnet/20260925-023131-upgrade.json",
+          "transactionDigest": "7ed6db74ff2d94bf19cd6423e4f3903792017c74623fae14e71caf600c30c09b",
+          "packageId": "0x9b10e51f8b32468ccb2401e51c9323e503fc5194e4b12c2256ba8c505167d7ea",
+          "status": "recorded"
+        }
+      ],
+      "notes": [
+        "The original Bulletin object remains historical and is not replaced by the new Bulletin.",
+        "The runtime directory also contains dry-run receipts; those are validation artifacts, not chain state changes."
+      ]
+    },
+    {
+      "id": "profile-v2-new-bulletin",
+      "status": "current",
+      "packageId": "0x81ad8f5410ed889dd406d5918c6b8b2ff67284e6a345c76ab15b41144c2a5615",
+      "bulletinObjectId": "0x3e2daf42f367b2f0becfcab81a904c11f98902e349496f83ad72d0a0b194d837",
+      "upgradeManagerId": "0xccc32884955acb3d405fad992425e30ab03f991ca1d2cef645f828cc68c4497f",
+      "rootAuthorityDid": "did:oan:RtAAn:2Xr85ZCniRMWQ1FzsB752VU5L38WcBic",
+      "records": [
+        {
+          "kind": "package-publish",
+          "recordFile": "runtime/mainnet/20260925-183322-publish.json",
+          "transactionDigest": "DoguFMQEXf9gx5tg1WigV8SKUTHaHDZvjrVDa7CedEfy",
+          "packageId": "0x81ad8f5410ed889dd406d5918c6b8b2ff67284e6a345c76ab15b41144c2a5615",
+          "initStateId": "0x25c5a6ca90b043a6c38333006d5028c5e14c189b4dd293b610dba6db5e0acc51",
+          "upgradeCapId": "0xe7955e9810358b3f071a3216a811f31d8048ee5616332ec76fb346bf8d37073c",
+          "status": "confirmed"
+        },
+        {
+          "kind": "bulletin-initialize",
+          "recordFile": "runtime/mainnet/20260925-183411-initialize.json",
+          "transactionDigest": "5gEgK9Hjjr6oPf7CvKFrW9ofRXeRCdwmR4Jqr9DLA8WK",
+          "bulletinObjectId": "0x3e2daf42f367b2f0becfcab81a904c11f98902e349496f83ad72d0a0b194d837",
+          "upgradeManagerId": "0xccc32884955acb3d405fad992425e30ab03f991ca1d2cef645f828cc68c4497f",
+          "status": "confirmed"
+        },
+        {
+          "kind": "governance-authorization-batch",
+          "recordFile": "../../genesis/authorization-results-profile-v2-new-bulletin.json",
+          "bulletinObjectId": "0x3e2daf42f367b2f0becfcab81a904c11f98902e349496f83ad72d0a0b194d837",
+          "proposalIds": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "subjects": [
+            "did:oan:2Xr85:HmxwAudrBEA87hc6tv9JQx91cNfLqHwv",
+            "did:oan:2Xr85:5dPoDSe9fSgEkuFcK9BSdoEiJfP8Zpsk",
+            "did:oan:2Xr85:HFmAwgn99Lf6jDhHfzfainfDSMKbzigY",
+            "did:oan:2Xr85:99utVLr2PqTthQtifEpqBDhuLx2AWqGc"
+          ],
+          "status": "confirmed"
+        },
+        {
+          "kind": "package-upgrade",
+          "recordFile": "runtime/mainnet/20260925-140731-upgrade.json",
+          "transactionDigest": "GHd9qqUweMa71Dc6si9KN4Ga31mKjNkQZ1r7yod7Y5NS",
+          "upgradeDigest": "c1003941fc3fa4d330d8ab9141485bc160af167295cf2862b7314c1d0413092f",
+          "packageId": "0x81ad8f5410ed889dd406d5918c6b8b2ff67284e6a345c76ab15b41144c2a5615",
+          "upgradeManagerVersion": 2,
+          "status": "confirmed",
+          "rootDidRotationAction": 51,
+          "rootDidRotationEvent": "GovernanceExecutionEvent"
+        },
+        {
+          "kind": "package-upgrade",
+          "recordFile": "runtime/mainnet/20260925-143441-upgrade.json",
+          "transactionDigest": "Ebrs1yksgoc8CzyFKyykN5fqFhma1wYmztZjmtUCp8Zs",
+          "upgradeDigest": "5469d2d290e87b4fc055c0b5e29f0b88c549fb927b4ce1971032c1cd1bef2c07",
+          "packageId": "0x81ad8f5410ed889dd406d5918c6b8b2ff67284e6a345c76ab15b41144c2a5615",
+          "upgradeManagerVersion": 3,
+          "newPackage": "0xf3168cc7de89d1936ca9a281909b945bfea2577c8fbd40d73b5a6bfe67e4f4d2",
+          "status": "confirmed",
+          "change": "action 51 requires zero target address"
+        }
+      ],
+      "verification": {
+        "bulletinSnapshot": "../../genesis/new-bulletin-object.json",
+        "rootAuthorityDidStoredOnChain": true,
+        "activeSubjectCount": 4,
+        "nextProposalId": 5,
+        "nextEventSequence": 4
+      }
+    }
+  ]
+}

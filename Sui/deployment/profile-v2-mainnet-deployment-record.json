@@ -1,0 +1,19 @@
+{
+  "networkAlias": "mainnet",
+  "chainId": "35834a8a",
+  "publishedAt": "2026-09-25T18:33:22+08:00",
+  "initializedAt": "2026-09-25T18:34:11+08:00",
+  "sender": "0x0b2bac7f473b73c37c9ba736e7545df87504028ee0981cd2fed7bfc5130a3c5d",
+  "packagePath": "tmp/oan-bulletin-mainnet-fresh-package-20260925183155",
+  "packageId": "0x81ad8f5410ed889dd406d5918c6b8b2ff67284e6a345c76ab15b41144c2a5615",
+  "publishDigest": "DoguFMQEXf9gx5tg1WigV8SKUTHaHDZvjrVDa7CedEfy",
+  "initStateId": "0x25c5a6ca90b043a6c38333006d5028c5e14c189b4dd293b610dba6db5e0acc51",
+  "upgradeCapId": "0xe7955e9810358b3f071a3216a811f31d8048ee5616332ec76fb346bf8d37073c",
+  "initializeDigest": "5gEgK9Hjjr6oPf7CvKFrW9ofRXeRCdwmR4Jqr9DLA8WK",
+  "bulletinObjectId": "0x3e2daf42f367b2f0becfcab81a904c11f98902e349496f83ad72d0a0b194d837",
+  "upgradeManagerId": "0xccc32884955acb3d405fad992425e30ab03f991ca1d2cef645f828cc68c4497f",
+  "rootAuthorityDid": "did:oan:RtAAn:2Xr85ZCniRMWQ1FzsB752VU5L38WcBic",
+  "governanceAuthorizationResult": "../../genesis/authorization-results-profile-v2-new-bulletin.json",
+  "bulletinSnapshot": "../../genesis/new-bulletin-object.json",
+  "status": "confirmed"
+}
