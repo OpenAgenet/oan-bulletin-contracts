@@ -44,7 +44,7 @@ Before publishing to Sui mainnet, make sure:
 - the sender address in your keystore has enough SUI for both publish and
   initialize transactions
 - the governance committee addresses in the config file are final and reviewed
-- the Move package at `../development/move-package` passes `sui move test`
+- the Move package at `../move-package` passes `sui move test`
 
 The scripts enforce the first two checks automatically and warn if the sender
 does not appear to have visible gas coins.

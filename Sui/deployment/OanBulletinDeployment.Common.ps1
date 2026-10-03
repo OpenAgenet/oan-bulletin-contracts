@@ -12,7 +12,7 @@ function Get-OanDeploymentRoot {
 }
 
 function Get-OanMovePackagePath {
-    return Join-Path (Split-Path -Parent $script:OanDeploymentRoot) "development\move-package"
+    return Join-Path (Split-Path -Parent $script:OanDeploymentRoot) "move-package"
 }
 
 function Get-OanRuntimeRoot {
