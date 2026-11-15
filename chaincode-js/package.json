@@ -1,0 +1,13 @@
+{
+  "name": "@openagenet/oan-bulletin-chaincode",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "description": "Hyperledger Fabric JavaScript chaincode for the OAN governance bulletin",
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "fabric-contract-api": "2.5.8"
+  }
+}

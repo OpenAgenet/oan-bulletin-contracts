@@ -1,0 +1,14 @@
+{
+  "name": "@openagenet/oan-bulletin-ethereum",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Ethereum implementation of the OAN governance bulletin contract",
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "devDependencies": {
+    "ethers": "6.15.0",
+    "ganache": "7.9.2",
+    "solc": "0.8.24"
+  }
+}

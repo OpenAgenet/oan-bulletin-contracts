@@ -7,6 +7,12 @@
 **/.trace
 **/.coverage*
 
+# Node.js contract dependencies and generated output
+**/node_modules/
+**/coverage/
+**/.nyc_output/
+npm-debug.log*
+
 # Local configuration and secrets
 *.local.toml
 *.local.yaml

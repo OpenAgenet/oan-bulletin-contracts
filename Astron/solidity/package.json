@@ -1,0 +1,13 @@
+{
+  "name": "@openagenet/oan-bulletin-astron-solidity",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Astron/Xinghuo BIF Solidity adapter for the OAN governance bulletin",
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "devDependencies": {
+    "@bifproject/solc-bif": "^0.8.21-5",
+    "solc": "0.8.21"
+  }
+}

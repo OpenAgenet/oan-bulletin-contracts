@@ -1,0 +1,9 @@
+{
+  "name": "@openagenet/oan-bulletin-astron-jsvm",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Astron/Xinghuo BIF JSVM implementation of the OAN governance bulletin",
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  }
+}

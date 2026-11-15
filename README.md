@@ -13,16 +13,23 @@ adapter is kept in its own directory so that chain-specific languages,
 deployment tools, package formats, and operational procedures do not leak into
 the other implementations.
 
-## Supported and Planned Chains
+## Contract Implementations
 
 - `Sui/`: Sui Move bulletin contract package.
-- `Astron/`: placeholder for the Astron implementation. Astron is the OAN
-  consortium-chain environment.
-- `Ethereum/`: placeholder for the Ethereum implementation.
+- `Ethereum/`: Solidity implementation for Ethereum-compatible networks.
+- `Astron/javascript/`: Astron/Xinghuo BIF V8 JavaScript implementation.
+- `Astron/solidity/`: Astron Solidity adapter for the shared Solidity
+  governance implementation. It must be compiled with the Astron platform
+  compiler for production use.
+- `chaincode-js/`: Hyperledger Fabric JavaScript chaincode implementation.
 
-The empty chain directories are intentional placeholders. An implementation
-should be added only after its contract model, event schema, deployment
-process, upgrade policy, and integration requirements have been defined.
+The Sui package is the currently used OAN contract. The other projects are
+cross-platform implementations of the same governance model and currently
+serve as compatibility references. They include basic local tests but no
+deployment automation or integration with other OAN modules.
+
+See [`SEMANTIC-PARITY.md`](SEMANTIC-PARITY.md) for the shared behavior and the
+intentional platform-specific adaptations.
 
 ## Repository Boundaries
 
@@ -67,6 +74,9 @@ Contract changes should include:
 - event and governance-state compatibility review;
 - upgrade and migration notes when published package behavior changes;
 - updates to the corresponding chain directory documentation.
+
+All contract source files must retain the copyright header used by the Sui
+implementation.
 
 Keep chain-specific code inside its chain directory. Shared governance
 semantics should be documented explicitly before introducing cross-chain
